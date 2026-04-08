@@ -338,6 +338,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // 3-second visual countdown loop
         ctx.textAlign = "center";
         for (let i = 3; i > 0; i--) {
+            if (!gameActive) return; // Abort async process if window is closed early
             drawSnake();
             ctx.fillStyle = "rgba(20,0,5,0.6)";
             ctx.fillRect(0, 0, snakeCanvas.width, snakeCanvas.height);
@@ -348,6 +349,7 @@ document.addEventListener("DOMContentLoaded", () => {
             ctx.shadowBlur = 0;
             await sleep(1000);
         }
+        if (!gameActive) return; // Final verification lock
 
         inputLocked = false;
         snakeInterval = setInterval(updateSnake, 120);
@@ -460,6 +462,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     const handleSnakeKey = (e) => {
+        if (!gameActive && !nameEntryActive) return; // Terminate unconditionally if functionally closed
+
         const validKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd', 'Enter'];
         if (validKeys.includes(e.key)) e.preventDefault();
 
