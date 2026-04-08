@@ -284,7 +284,8 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             
             state = "SYSTEM";
-            promptPrefix.textContent = "LopiLuna@host \x3e";
+            const displayHost = (username.toLowerCase() === "lopi") ? "LopiLuna" : username.toLowerCase();
+            promptPrefix.textContent = `${displayHost}@host \x3e`;
             hiddenInput.value = "";
             typingBuffer.textContent = "";
         }
