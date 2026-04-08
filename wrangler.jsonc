@@ -8,6 +8,10 @@
   "compatibility_flags": [
     "nodejs_compat"
   ],
+  "main": "index.js",
+  "assets": {
+    "directory": "."
+  },
   "kv_namespaces": [
     {
       "binding": "LOPI_KV",
