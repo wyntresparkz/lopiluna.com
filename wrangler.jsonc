@@ -7,5 +7,11 @@
   },
   "compatibility_flags": [
     "nodejs_compat"
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "LOPI_KV",
+      "id": "7d7a06d2c52748b68b4ff780cf2ceec8"
+    }
   ]
 }
