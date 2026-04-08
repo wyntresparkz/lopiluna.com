@@ -6,7 +6,10 @@ const KV_NAMESPACE = 'LOPI_KV';
 export async function onRequestGet(context) {
     try {
         const kv = context.env[KV_NAMESPACE];
-        if (!kv) return Response.json({ error: "KV not configured" }, { status: 500 });
+        if (!kv) {
+            console.error(`KV Namespace ${KV_NAMESPACE} not found in environment.`);
+            return Response.json({ error: "KV not configured" }, { status: 500 });
+        }
         
         const url = new URL(context.request.url);
         const id = url.searchParams.get("id");
@@ -18,6 +21,7 @@ export async function onRequestGet(context) {
         
         return Response.json(JSON.parse(dataStr), { status: 200 });
     } catch (err) {
+        console.error("GET Pet Error:", err);
         return Response.json({ error: "Failed to fetch pet" }, { status: 500 });
     }
 }
@@ -25,10 +29,14 @@ export async function onRequestGet(context) {
 export async function onRequestPost(context) {
     try {
         const kv = context.env[KV_NAMESPACE];
-        if (!kv) return Response.json({ error: "KV not configured" }, { status: 500 });
+        if (!kv) {
+            console.error(`KV Namespace ${KV_NAMESPACE} not found in environment.`);
+            return Response.json({ error: "KV not configured" }, { status: 500 });
+        }
 
         const body = await context.request.json();
         const { id, hunger, happy, lastUpdated } = body;
+        console.log(`Received Pet POST for ID: ${id}`);
 
         if (!id || typeof id !== 'string' || id.length > 10) {
             return Response.json({ error: "Invalid ID" }, { status: 400 });
@@ -43,9 +51,11 @@ export async function onRequestPost(context) {
 
         // Save back to KV using a unique pet_ prefix to not overlap with snake scores
         await kv.put(`pet_${sanitizedData.id}`, JSON.stringify(sanitizedData));
+        console.log(`Successfully saved pet data for ${sanitizedData.id}`);
 
         return Response.json(sanitizedData, { status: 200 });
     } catch (err) {
+        console.error("POST Pet Error:", err);
         return Response.json({ error: "Failed to save pet" }, { status: 500 });
     }
 }

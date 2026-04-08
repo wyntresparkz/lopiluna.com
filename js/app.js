@@ -67,12 +67,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 localStorage.setItem("lopi_guestbook", JSON.stringify(localGB));
             }
             try {
-                await fetch('/api/guestbook', {
+                const res = await fetch('/api/guestbook', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name })
                 });
-            } catch(e) {}
+                if (!res.ok) console.error("Guestbook POST failed:", res.status, await res.text());
+            } catch(e) {
+                console.error("Guestbook API Error:", e);
+            }
         };
 
         const fetchGuestbook = async () => {
@@ -82,8 +85,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (res.ok) {
                     let cl = await res.json();
                     if (Array.isArray(cl) && cl.length > 0) list = cl;
+                } else {
+                    console.error("Guestbook GET failed:", res.status);
                 }
-            } catch(e) {}
+            } catch(e) {
+                console.error("Guestbook Fetch Error:", e);
+            }
             
             if (list.length === 0) {
                 printLine("No signatures detected.", "text-faint");
@@ -578,12 +585,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Actual API Call (silent fail locally)
         try {
-            await fetch('/api/scores', {
+            const res = await fetch('/api/scores', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name: finalName, score: finalScore })
             });
-        } catch(e) {}
+            if (!res.ok) console.error("Scores POST failed:", res.status, await res.text());
+        } catch(e) {
+            console.error("Scores API Error:", e);
+        }
 
         showLeaderboard();
     };
@@ -598,8 +608,14 @@ document.addEventListener("DOMContentLoaded", () => {
         let scores = JSON.parse(localStorage.getItem("lopi_snake_scores") || "[]");
         try {
             let res = await fetch('/api/scores');
-            if(res.ok) scores = await res.json();
-        } catch(e) {}
+            if(res.ok) {
+                scores = await res.json();
+            } else {
+                console.error("Scores GET failed:", res.status);
+            }
+        } catch(e) {
+            console.error("Scores Fetch Error:", e);
+        }
 
         listUi.innerHTML = "";
         const top5 = scores.slice(0, 5);
@@ -662,14 +678,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Mock API Fetch (Silent Load)
         try {
-            let res = await fetch(`/api/pet?id=\${petData.id}`);
+            let res = await fetch(`/api/pet?id=${petData.id}`);
             if (res.ok) {
                 let cloudData = await res.json();
                 if (cloudData.hunger !== undefined) {
                     petData = cloudData;
                 }
+            } else {
+                console.error("Pet GET failed:", res.status);
             }
-        } catch(e) {}
+        } catch(e) {
+            console.error("Pet Fetch Error:", e);
+        }
         
         let now = Date.now();
         let minPassed = Math.floor((now - petData.lastUpdated) / 60000);
@@ -687,12 +707,15 @@ document.addEventListener("DOMContentLoaded", () => {
         petData.lastUpdated = Date.now();
         localStorage.setItem("tamalopi_data", JSON.stringify(petData));
         try {
-            fetch("/api/pet", {
+            const res = await fetch("/api/pet", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(petData)
             });
-        } catch(e) {}
+            if (!res.ok) console.error("Pet POST failed:", res.status);
+        } catch(e) {
+            console.error("Pet Save Error:", e);
+        }
     };
 
     const updateStatBars = () => {
