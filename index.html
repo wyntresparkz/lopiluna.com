@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revelation OS</title>
+    <!-- Google Fonts: Fira Code -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- CRT Overlay Effects -->
+    <div class="crt pointer-events-none"></div>
+    <div class="scanline pointer-events-none"></div>
+
+    <div class="terminal-container">
+        <!-- Header Section -->
+        <header class="terminal-header">
+            <div class="header-top">
+                <h1 class="glitch-text">LopiLuna System</h1>
+                <div class="sys-info">
+                    <span>MEM_ALLOC: 8192KB</span>
+                    <span>PUNK_HZ: 90.0MHz</span>
+                </div>
+            </div>
+            <p class="subtitle">Retro-Punk Protocol v1.0 // Auth Layer: ACTIVE</p>
+        </header>
+
+        <!-- Dynamic Boot Terminal Log -->
+        <main id="terminal-content" class="terminal-content scrollbar-hide">
+            <!-- JS will inject lines here initially -->
+        </main>
+
+        <!-- Interactive Form / Prompt -->
+        <footer class="terminal-input-area" id="terminal-input-area" style="opacity: 0;">
+            <div class="input-line" id="input-container">
+                <span class="prompt-arrow" id="prompt-prefix">&gt;</span>
+                <span id="typing-buffer" class="typing-text"></span><span class="cursor"></span>
+            </div>
+            <!-- Hidden input to capture native keyboard events easily -->
+            <input type="text" id="hidden-input" class="hidden-input" autocomplete="off" spellcheck="false" autofocus>
+        </footer>
+
+        <!-- Snake Game Window -->
+        <div id="snake-window" class="snake-window" style="display: none;">
+            <div class="snake-header">
+                <span class="snake-title">LOPI_SNAKE.EXE</span>
+                <span class="snake-score" id="snake-score">SCORE: 0</span>
+                <button class="snake-closeBtn" id="snake-closeBtn">[ X ]</button>
+            </div>
+            <div class="snake-body" style="position: relative;">
+                <canvas id="snake-canvas"></canvas>
+                
+                <!-- Arcade Name Entry UI -->
+                <div id="snake-name-entry" class="snake-overlay hidden">
+                    <h3>NEW HIGH SCORE!</h3>
+                    <div class="arcade-inputs" id="arcade-inputs">
+                        <!-- Instantiated by JS -->
+                    </div>
+                    <p class="text-faint blink mt-2">[PRESS ENTER / TAP HERE]</p>
+                </div>
+
+                <!-- Leaderboard UI -->
+                <div id="snake-leaderboard" class="snake-overlay hidden">
+                    <h3>GLOBAL TOP SCORES</h3>
+                    <div class="leaderboard-list mt-2" id="leaderboard-list">
+                        <!-- Populated by JS -->
+                    </div>
+                    <p class="text-faint blink mt-2 pt-2">[CLICK TO RESTART]</p>
+                </div>
+            </div>
+            <div class="snake-footer text-faint">
+                [USE ARROWS/WASD OR SWIPE]
+            </div>
+        </div>
+
+        <!-- Tamalopi Virtual Pet Window -->
+        <div id="tamalopi-window" class="snake-window" style="display: none; z-index: 60;">
+            <div class="snake-header">
+                <span class="snake-title">TAMALOPI.EXE</span>
+                <button class="snake-closeBtn" id="tamalopi-closeBtn">[ X ]</button>
+            </div>
+            
+            <div class="tamalopi-stats" style="flex-shrink: 0; padding: 0.5rem; border-bottom: 1px solid var(--primary-pink-muted); background: rgba(0,0,0,0.5);">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.25rem;">
+                    <span style="font-size: 0.75rem; color: var(--primary-pink); width: 60px;">HUNGER</span>
+                    <div style="flex:1; background: #222; height: 10px; margin: 0 0.5rem; border: 1px solid var(--primary-pink-muted);">
+                        <div id="t-hunger-bar" style="background: #22c55e; width: 100%; height: 100%; transition: width 0.3s;"></div>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <span style="font-size: 0.75rem; color: var(--primary-pink); width: 60px;">HAPPY</span>
+                    <div style="flex:1; background: #222; height: 10px; margin: 0 0.5rem; border: 1px solid var(--primary-pink-muted);">
+                        <div id="t-happy-bar" style="background: #eab308; width: 100%; height: 100%; transition: width 0.3s;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="snake-body" style="background: var(--bg-color); position: relative; flex: 1; min-height: 0;">
+                <canvas id="tamalopi-canvas" style="width: 100%; height: 100%;"></canvas>
+                
+                <!-- Sync Modal Dialog -->
+                <div id="tamalopi-sync-modal" class="snake-overlay hidden">
+                    <h3>TAMALOPI SYNC</h3>
+                    <p class="text-faint" style="font-size: 0.8rem;">Your secure Pet ID is:</p>
+                    <div id="t-sync-display" style="background: black; padding: 0.5rem; border: 2px dashed var(--primary-pink); font-size: 1.25rem; font-weight: bold; margin: 0.5rem 0; letter-spacing: 2px;">LOADING</div>
+                    <p class="text-faint" style="font-size: 0.8rem; margin-top: 1rem; border-top: 1px solid var(--primary-pink-muted); padding-top: 0.5rem;">Load an existing Pet ID:</p>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                        <input type="text" id="t-sync-input" placeholder="ID" maxlength="6" style="flex: 1; background: black; border: 1px solid var(--primary-pink); color: white; padding: 0.5rem; font-family: inherit; font-size: 1rem; text-transform: uppercase;">
+                        <button id="t-sync-btn" style="background: var(--primary-pink); color: black; border: none; font-weight: bold; padding: 0 1rem; cursor: pointer; font-family: inherit;">LOAD</button>
+                    </div>
+                    <button id="t-sync-close" style="background: transparent; border: none; color: #ff3333; margin-top: 1rem; cursor: pointer; font-family: inherit;">[ CANCEL ]</button>
+                </div>
+            </div>
+
+            <div style="display: flex; border-top: 1px solid var(--primary-pink-faint); background: rgba(0,0,0,0.5); flex-shrink: 0; min-height: 40px;">
+                <button id="t-btn-feed" style="flex: 1; padding: 0.75rem; background: transparent; border: none; border-right: 1px solid var(--primary-pink-faint); color: var(--primary-pink); font-family: inherit; font-weight: bold; cursor: pointer;">FEED</button>
+                <button id="t-btn-play" style="flex: 1; padding: 0.75rem; background: transparent; border: none; border-right: 1px solid var(--primary-pink-faint); color: var(--primary-pink); font-family: inherit; font-weight: bold; cursor: pointer;">PLAY</button>
+                <button id="t-btn-sync" style="flex: 1; padding: 0.75rem; background: transparent; border: none; color: #888; font-family: inherit; font-size: 0.75rem; cursor: pointer;">SYNC ID</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="js/app.js?v=2"></script>
+</body>
+</html>
