@@ -321,7 +321,7 @@ document.addEventListener("DOMContentLoaded", () => {
         gridSizeY = snakeCanvas.height / gridCount;
     };
 
-    const startSnakeGame = () => {
+    const startSnakeGame = async () => {
         if (gameActive) return;
         gameActive = true;
         snakeWindow.style.display = "flex";
@@ -329,10 +329,26 @@ document.addEventListener("DOMContentLoaded", () => {
         resizeCanvas();
         snakeBody = [{ x: 10, y: 10 }, { x: 9, y: 10 }, { x: 8, y: 10 }];
         dx = 1; dy = 0;
-        inputLocked = false;
+        inputLocked = true; // Lock input during countdown
         placeFood();
         snakeScoreUI.textContent = "SCORE: 0";
+        drawSnake(); // Draw initial graphics behind countdown
 
+        // 3-second visual countdown loop
+        ctx.textAlign = "center";
+        for (let i = 3; i > 0; i--) {
+            drawSnake();
+            ctx.fillStyle = "rgba(20,0,5,0.6)";
+            ctx.fillRect(0, 0, snakeCanvas.width, snakeCanvas.height);
+            ctx.fillStyle = "#f472b6";
+            ctx.font = "bold 60px 'Fira Code', monospace";
+            ctx.shadowBlur = 15; ctx.shadowColor = "#f472b6";
+            ctx.fillText(i.toString(), snakeCanvas.width / 2, snakeCanvas.height / 2 + 20);
+            ctx.shadowBlur = 0;
+            await sleep(1000);
+        }
+
+        inputLocked = false;
         snakeInterval = setInterval(updateSnake, 120);
         document.addEventListener("keydown", handleSnakeKey);
     };
@@ -431,6 +447,8 @@ document.addEventListener("DOMContentLoaded", () => {
             ctx.shadowBlur = 5; ctx.shadowColor = "#f472b6";
             ctx.fillText("[TAP TO REBOOT]", snakeCanvas.width / 2, snakeCanvas.height / 2 + 30);
             ctx.shadowBlur = 0;
+            
+            gameActive = false; // Bug fix: unlock restart flow on zero point gameover
         }
     };
 
